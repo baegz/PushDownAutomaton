@@ -15,10 +15,11 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
+    a.setStyle("fusion");
     Dialog w;
     //w.style("fusion")
-    w.Dialog::setStyle(QStyleFactory::create("fusion"));
-    /*QPalette palette;
+    /*w.Dialog::setStyle(QStyleFactory::create("fusion"));
+    QPalette palette;
     palette.setColor(QPalette::Window, QColor(53,53,53));
     palette.setColor(QPalette::WindowText, Qt::white);
     palette.setColor(QPalette::Base, QColor(15,15,15));

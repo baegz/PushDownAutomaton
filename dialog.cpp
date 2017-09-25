@@ -85,12 +85,12 @@ void Dialog::on_validateExpression_clicked()
                     QMessageBox::information(this,"Resultado","Expresion no aceptada!");
                 }
             }else{
-                QMessageBox::information(this,"Resultado","Se requiere un estado de aceptacion!");
+                QMessageBox::warning(this,"Resultado","Se requiere un estado de aceptacion!");
             }
         }else{
-            QMessageBox::information(this,"Resultado","Se requiere un estado inicial!");
+            QMessageBox::warning(this,"Resultado","Se requiere un estado inicial!");
         }
     }else{
-        QMessageBox::information(this,"Resultado","");
+        QMessageBox::warning(this,"Resultado","Sin expression!");
     }
 }

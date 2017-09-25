@@ -35,3 +35,5 @@ HEADERS += \
 
 FORMS += \
         dialog.ui
+
+RC_ICONS = icon.ico
