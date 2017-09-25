@@ -28,7 +28,10 @@ SOURCES += \
         dialog.cpp
 
 HEADERS += \
-        dialog.h
+        dialog.h \
+    condition.h \
+    state.h \
+    stackautomaton.h
 
 FORMS += \
         dialog.ui

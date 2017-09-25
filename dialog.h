@@ -2,6 +2,8 @@
 #define DIALOG_H
 
 #include <QDialog>
+#include <QGraphicsScene>
+#include "stackautomaton.h"
 
 namespace Ui {
 class Dialog;
@@ -17,6 +19,9 @@ public:
 
 private:
     Ui::Dialog *ui;
+    QGraphicsScene *scene;
+    QGraphicsEllipseItem *ellipse;
+    StackAutomaton *stackAutomaton;
 };
 
 #endif // DIALOG_H
