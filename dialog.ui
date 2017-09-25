@@ -49,6 +49,9 @@
      <height>431</height>
     </size>
    </property>
+   <property name="acceptDrops">
+    <bool>true</bool>
+   </property>
   </widget>
   <widget class="QGroupBox" name="groupBox">
    <property name="geometry">
@@ -172,19 +175,31 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_9">
         <item>
-         <widget class="QLineEdit" name="lineEdit"/>
+         <widget class="QLineEdit" name="origin"/>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_2"/>
+         <widget class="QLineEdit" name="destination"/>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_4"/>
+         <widget class="QLineEdit" name="tape">
+          <property name="maxLength">
+           <number>1</number>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_5"/>
+         <widget class="QLineEdit" name="pop">
+          <property name="maxLength">
+           <number>1</number>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="lineEdit_3"/>
+         <widget class="QLineEdit" name="push">
+          <property name="maxLength">
+           <number>10</number>
+          </property>
+         </widget>
         </item>
        </layout>
       </item>

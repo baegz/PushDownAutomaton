@@ -90,6 +90,20 @@ class StackAutomaton{
             }
         }
 
+        bool existCondition(QString a, QString b, condition c){
+            int va = getNumOfState(a);
+            int vb = getNumOfState(b);
+            if(va<0 || vb<0){
+                return false;
+            }else{
+                bool exist=false;
+                for(int i=0;i<matAdj[va][vb].size();i++)
+                    if(matAdj[va][vb][i].tape == c.tape && matAdj[va][vb][i].x == c.x && matAdj[va][vb][i].y == c.y)
+                        return true;
+                return false;
+            }
+        }
+
         void newCondition(QString a, QString b, condition c){
             int va = getNumOfState(a);
             int vb = getNumOfState(b);
