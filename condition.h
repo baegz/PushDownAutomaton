@@ -3,7 +3,7 @@
 
 struct condition{
     char tape;
-    string x,y;
+    QString x,y;
 };
 
 #endif // CONDITION_H

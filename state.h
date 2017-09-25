@@ -5,19 +5,19 @@
 
 class State{
     protected:
-        string name;
+        QString name;
         int numOfState;
         int type;
     public:
         State(){}
 
-        State(string name){
+        State(QString name){
             this->name = name;
             this->type = 2;
             numOfState = -1;
         }
 
-        string getType(){
+        QString getType(){
             switch(type){
                 case 1:
                     return "Inicial";
@@ -30,13 +30,13 @@ class State{
             }
         }
 
-        State(string name, int num, int type){
+        State(QString name, int num, int type){
             this->name = name;
             this->numOfState = num;
             this->type = type;
         }
 
-        void setName(string name){
+        void setName(const QString name){
             this->name = name;
         }
 
@@ -44,7 +44,7 @@ class State{
             this->numOfState = num;
         }
 
-        string getName(){
+        QString getName(){
             return this->name;
         }
 
@@ -56,7 +56,7 @@ class State{
             return v.name == this->name;
         }
 
-        bool similar(string name){
+        bool similar(QString name){
             return name == this->name;
         }
 };

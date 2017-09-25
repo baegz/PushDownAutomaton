@@ -1,24 +1,29 @@
 #ifndef STACKAUTOMATON_H
 #define STACKAUTOMATON_H
 
+#include <QDebug>
+#include <QCharRef>
+#include <QVector>
+#include <QStack>
+#include <QString>
 #include "state.h"
 
-int password=0xFFFF;
-bool isAccepted;
+using namespace std;
 
 class StackAutomaton{
     protected:
         int numStates;
         int maxStates;
         State *states;
-        vector<condition> **matAdj;
-        stack<char> characters;
-        string expression;
+        QVector<condition> **matAdj;
+        QStack<char> characters;
+        QString expression;
+        bool isAccepted;
     public:
         StackAutomaton(){
             characters.push('#');
             maxStates = 1;
-            StackAutomaton(maxVertex);
+            StackAutomaton(maxStates);
             expression="";
         }
 
@@ -28,9 +33,9 @@ class StackAutomaton{
             maxStates = max;
             numStates = 0;
             states = new State[max];
-            matAdj = new vector<condition>*[max];
+            matAdj = new QVector<condition>*[max];
             for(int i = 0;i < max;i++){
-                matAdj[i] = new vector<condition>[max];
+                matAdj[i] = new QVector<condition>[max];
             }
         }
 
@@ -42,14 +47,20 @@ class StackAutomaton{
             return this->numStates;
         }
 
+        bool existInicialState(){
+            for(int i=0;i<numStates;i++)
+                if(states[i].getType() == "Inicial")
+                    return true;
+            return false;
+        }
+
         State getInitialState(){
             for(int i=0;i<numStates;i++)
                 if(states[i].getType() == "Inicial")
                     return states[i];
         }
 
-        void getAcceptanceStates(vector<State> &s){
-            vector<State> v;
+        void getAcceptanceStates(QVector<State> &s){
             for(int i=0;i<numStates;i++)
                 if(states[i].getType() == "Aceptacion")
                     s.push_back(states[i]);
@@ -59,7 +70,7 @@ class StackAutomaton{
             numStates = n;
         }
 
-        int getNumOfState(string name){
+        int getNumOfState(QString name){
             bool founed=false;
             for(int i = 0;i < numStates && !founed;i++){
                 if(states[i].similar(name))
@@ -68,33 +79,33 @@ class StackAutomaton{
             return -1;
         }
 
-        void newState(string name, int type){
+        void newState(QString name, int type){
             bool exist = getNumOfState(name)>-1;
             if(!exist){
                 State s = State(name, numStates, type);
                 states[numStates++] = s;
-                cout<<"\n\n\t\tEstado creado exitosamente!";
+                qDebug()<<"\n\n\t\tEstado creado exitosamente!";
             }else{
-                cout<<"\n\n\t\tEl estado ya existe!";
+                qDebug()<<"\n\n\t\tEl estado ya existe!";
             }
         }
 
-        void newCondition(string a, string b, condition c){
+        void newCondition(QString a, QString b, condition c){
             int va = getNumOfState(a);
             int vb = getNumOfState(b);
             if(va<0 && vb<0){
-                cout<<"\n\n\t\tNo existen los estados";
+                qDebug() << "\n\n\t\tNo existen los estados";
             }else if(va<0){
-                cout<<"\n\n\t\tEl estado origen no existe!";
+                qDebug() << "\n\n\t\tEl estado origen no existe!";
             }else if(vb<0){
-                cout<<"\n\n\t\tEl estado destino no existe!";
+                qDebug() << "\n\n\t\tEl estado destino no existe!";
             }else{
                 matAdj[va][vb].push_back(c);
-                cout<<"\n\n\t\tCondicion creada correctamente!";
+                qDebug() << "\n\n\t\tCondicion creada correctamente!";
             }
         }
 
-        bool adjacent(string a, string b){
+        bool adjacent(QString a, QString b){
             int va =  getNumOfState(a);
             int vb =  getNumOfState(b);
             if(va<0 || vb<0){
@@ -114,7 +125,7 @@ class StackAutomaton{
 
         State getState(int x){
             if(x<0 || x> numStates){
-                cout<<"This vertex don't exist!\n";
+                qDebug() <<"This vertex don't exist!\n";
             }else{
                 return states[x];
             }
@@ -122,7 +133,7 @@ class StackAutomaton{
 
         void setState(State v, int va){
             if(va<0 || va>numStates){
-                cout<<"This vertex don't exist!\n";
+                qDebug()<<"This vertex don't exist!\n";
             }else{
                 states[va]=v;
             }
@@ -130,15 +141,15 @@ class StackAutomaton{
 
         void printStates(){
             if(numStates < 1){
-                cout<<"No hay estados!";
+                qDebug()<<"No hay estados!";
             }else{
-                cout<<"Estados: {";
+                qDebug()<<"Estados: {";
                 for(int i=0; i<numStates; i++){
-                    cout<<"("<<states[i].getName()<<","<<states[i].getType()<<")";
+                    qDebug()<<"("<<states[i].getName()<<","<<states[i].getType()<<")";
                     if(i != numStates-1)
-                        cout<<" - ";
+                        qDebug()<<" - ";
                 }
-                cout<<"}";
+                qDebug()<<"}";
             }
         }
 
@@ -146,49 +157,50 @@ class StackAutomaton{
             for(int i=0;i<numStates;i++){
                 for(int j=0;j<numStates;j++){
                     if(matAdj[i][j].size() > 0){
-                        cout<<"\nCondiciones de \""<<states[i].getName()<<"\" hacia \""<<states[j].getName()<<"\"\n";
+                        qDebug()<<"\nCondiciones de \""<<states[i].getName()<<"\" hacia \""<<states[j].getName()<<"\"\n";
                         for(int k=0;k<matAdj[i][j].size();k++){
-                            cout<<matAdj[i][j][k].tape<<", "<<matAdj[i][j][k].x<<"/ "<<matAdj[i][j][k].y<<endl;
+                            qDebug()<<matAdj[i][j][k].tape<<", "<<matAdj[i][j][k].x<<"/ "<<matAdj[i][j][k].y<<endl;
                         }
                     }
                 }
             }
         }
 
-        bool seekAcceptance(string origin, string destination, int level){
-            cout<<"Estado origen es: "<<origin<<endl;
+        bool seekAcceptance(QString origin, QString destination, int level){
+            //qDebug()<<"Estado origen es: "<<origin<<endl;
             if(!isAccepted){
                 int v = getNumOfState(origin);
                 for(int i=0;i<=numStates;i++){
                     if(adjacent(v,i)){ //Verifica si existen condiciones de un estado a otro
-                        bool possible = false;
+                        //bool possible = false;
                         if(level < expression.size()){
                             for(int j=0;j<matAdj[v][i].size();j++){ //Vector de condiciones en esa posicion de la matriz
                                 if(matAdj[v][i][j].tape == expression[level]){ //
-                                    possible = true;
+                                    //possible = true;
                                     if(characters.top() == matAdj[v][i][j].x[0]){
-                                        cout<<"\nLa cinta y la pila coinciden!\n";
+                                        //qDebug()<<"\nLa cinta y la pila coinciden!\n";
                                         if(states[i].getName() ==  destination){
                                             isAccepted=true;
-                                            cout<<"Aceptado en: "<<destination;
-                                            cout<<"\nEstado final de la pila:\n";
+                                            //qDebug()<<"Aceptado en: "<<destination;
+                                            //qDebug()<<"\nEstado final de la pila:\n";
                                             while(!this->characters.empty()){
-                                                cout<<this->characters.top()<<endl;
+                                                //qDebug()<<this->characters.top()<<endl;
                                                 characters.pop();
                                             }
                                             return isAccepted;
                                         }else{
                                             int k;
+                                            string qs;
                                             bool put=false;
-                                            vector<char> toApile;
+                                            QVector<char> toApile;
                                             toApile.push_back(this->characters.top());
                                             this->characters.pop(); //Quitando de la pila
-
                                             if(matAdj[v][i][j].y != "~"){ //Si es diferende lamda puedo apilar
                                                 put=true;
                                                 for(k=0;k<matAdj[v][i][j].y.size();k++){
-                                                    cout<<"apilando: "<<matAdj[v][i][j].y[k]<<endl;
-                                                    this->characters.push(matAdj[v][i][j].y[k]);
+                                                    qs = matAdj[v][i][j].y.toStdString();
+                                                    //qDebug()<<"apilando: "<<matAdj[v][i][j].y[k]<<endl;
+                                                    this->characters.push(qs[k]);
                                                 }
                                             }
                                             return seekAcceptance(states[i].getName(),destination,level+1);
@@ -214,9 +226,9 @@ class StackAutomaton{
                                         if(states[i].getName() ==  destination){
                                             isAccepted=true;
                                             //cout<<"\nEstado final de la pila:\n";
-                                            cout<<"Aceptada en: "<<destination<<" por Epsilon!!!!\n";
+                                            //cout<<"Aceptada en: "<<destination<<" por Epsilon!!!!\n";
                                             while(!this->characters.empty()){
-                                                cout<<this->characters.top()<<endl;
+                                                //cout<<this->characters.top()<<endl;
                                                 characters.pop();
                                             }
                                             return isAccepted;
@@ -230,12 +242,12 @@ class StackAutomaton{
             }
         }
 
-        bool validateExpression(string expression){
+        bool validateExpression(QString expression){
             while(!this->characters.empty()){
                 this->characters.pop();
             }
             this->characters.push('#');
-            vector<State> s;
+            QVector<State> s;
             getAcceptanceStates(s);
             this->expression = expression;
             State initial = this->getInitialState();
