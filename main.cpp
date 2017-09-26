@@ -18,7 +18,7 @@ int main(int argc, char *argv[])
     a.setStyle("fusion");
     Dialog w;
     //w.style("fusion")
-    /*w.Dialog::setStyle(QStyleFactory::create("fusion"));
+    //w.Dialog::setStyle(QStyleFactory::create("fusion"));
     QPalette palette;
     palette.setColor(QPalette::Window, QColor(53,53,53));
     palette.setColor(QPalette::WindowText, Qt::white);
@@ -33,9 +33,8 @@ int main(int argc, char *argv[])
 
     palette.setColor(QPalette::Highlight, QColor(142,45,197).lighter());
     palette.setColor(QPalette::HighlightedText, Qt::black);
-    w.setPalette(palette);*/
+    w.setPalette(palette);
     w.setWindowTitle("Automata de pila: por Leonardo Ospino & Leonardo Burgos");
     w.show();
-
     return a.exec();
 }

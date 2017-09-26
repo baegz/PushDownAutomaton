@@ -80,6 +80,7 @@ void Dialog::on_newCondition_clicked()
         if(a != -1 &&  b != -1){
             if(!stackAutomaton->existCondition(origin,destination,c)){
                 stackAutomaton->newCondition(origin,destination,c);
+                //this->drawCondition(origin,destination,c);
                 QMessageBox::information(this,"Nueva codicion","La condicion ha sido creada exitosamente!");
             }else{
                 stackAutomaton->newCondition(origin,destination,c);
