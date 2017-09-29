@@ -5,7 +5,7 @@
 #include <QGraphicsScene>
 #include <QGraphicsTextItem>
 #include <QMessageBox>
-#include "stackautomaton.h"
+#include "pushDownAutomaton.h"
 
 struct point{
     QString name;
@@ -108,7 +108,7 @@ private:
     Ui::Dialog *ui;
     QGraphicsScene *scene;
     QGraphicsEllipseItem *currentState;
-    StackAutomaton *stackAutomaton;
+    PushDownAutomaton *pda;
     QVector<QGraphicsEllipseItem *> states;
     QVector<point> pointStates;
     QRect *arrow;

@@ -31,7 +31,7 @@ HEADERS += \
         dialog.h \
     condition.h \
     state.h \
-    stackautomaton.h
+    pushDownAutomaton.h
 
 FORMS += \
         dialog.ui

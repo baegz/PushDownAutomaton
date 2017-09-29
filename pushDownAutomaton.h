@@ -1,5 +1,5 @@
-#ifndef STACKAUTOMATON_H
-#define STACKAUTOMATON_H
+#ifndef PUSHDOWNAUTOMATON_H
+#define PUSHDOWNAUTOMATON_H
 
 #include <QDebug>
 #include <QCharRef>
@@ -10,7 +10,7 @@
 
 using namespace std;
 
-class StackAutomaton{
+class PushDownAutomaton{
     protected:
         int numStates;
         int maxStates;
@@ -20,14 +20,14 @@ class StackAutomaton{
         QString expression;
         bool isAccepted;
     public:
-        StackAutomaton(){
+        PushDownAutomaton(){
             characters.push('#');
             maxStates = 1;
-            StackAutomaton(maxStates);
+            PushDownAutomaton(maxStates);
             expression="";
         }
 
-        StackAutomaton(int max){
+        PushDownAutomaton(int max){
             characters.push('#');
             expression="";
             maxStates = max;
@@ -96,7 +96,6 @@ class StackAutomaton{
             if(va<0 || vb<0){
                 return false;
             }else{
-                bool exist=false;
                 for(int i=0;i<matAdj[va][vb].size();i++)
                     if(matAdj[va][vb][i].tape == c.tape && matAdj[va][vb][i].x == c.x && matAdj[va][vb][i].y == c.y)
                         return true;
@@ -181,24 +180,17 @@ class StackAutomaton{
         }
 
         bool seekAcceptance(QString origin, QString destination, int level){
-            //qDebug()<<"Estado origen es: "<<origin<<endl;
             if(!isAccepted){
                 int v = getNumOfState(origin);
                 for(int i=0;i<=numStates;i++){
-                    if(adjacent(v,i)){ //Verifica si existen condiciones de un estado a otro
-                        //bool possible = false;
+                    if(adjacent(v,i)){
                         if(level < expression.size()){
-                            for(int j=0;j<matAdj[v][i].size();j++){ //Vector de condiciones en esa posicion de la matriz
-                                if(matAdj[v][i][j].tape == expression[level]){ //
-                                    //possible = true;
+                            for(int j=0;j<matAdj[v][i].size();j++){
+                                if(matAdj[v][i][j].tape == expression[level]){
                                     if(characters.top() == matAdj[v][i][j].x[0]){
-                                        //qDebug()<<"\nLa cinta y la pila coinciden!\n";
-                                        if(states[i].getName() ==  destination){
+                                        if(states[i].getName() ==  destination && expression.size()-1 == level){
                                             isAccepted=true;
-                                            //qDebug()<<"Aceptado en: "<<destination;
-                                            //qDebug()<<"\nEstado final de la pila:\n";
                                             while(!this->characters.empty()){
-                                                //qDebug()<<this->characters.top()<<endl;
                                                 characters.pop();
                                             }
                                             return isAccepted;
@@ -208,12 +200,11 @@ class StackAutomaton{
                                             bool put=false;
                                             QVector<char> toApile;
                                             toApile.push_back(this->characters.top());
-                                            this->characters.pop(); //Quitando de la pila
-                                            if(matAdj[v][i][j].y != "~"){ //Si es diferende lamda puedo apilar
+                                            this->characters.pop();
+                                            if(matAdj[v][i][j].y != "~"){
                                                 put=true;
                                                 for(k=0;k<matAdj[v][i][j].y.size();k++){
                                                     qs = matAdj[v][i][j].y.toStdString();
-                                                    //qDebug()<<"apilando: "<<matAdj[v][i][j].y[k]<<endl;
                                                     this->characters.push(qs[k]);
                                                 }
                                             }
@@ -231,18 +222,12 @@ class StackAutomaton{
                                 }
                             }
                         }else{
-                            //cout<<"\nSe han habilitado las oscilaciones epsilon!";
                             for(int m=0;m<matAdj[v][i].size();m++){
                                 if(matAdj[v][i][m].tape == '~'){
                                     if(characters.top() == matAdj[v][i][m].x[0]){
-                                        //cout<<"\nEstoy en el estado: "<<origin;
-                                        //cout<<"\nTengo una osilacion epsilon que hacer!\nFUE ACEPTADA!";
-                                        if(states[i].getName() ==  destination){
+                                        if(states[i].getName() ==  destination && expression.size()-1 == level){
                                             isAccepted=true;
-                                            //cout<<"\nEstado final de la pila:\n";
-                                            //cout<<"Aceptada en: "<<destination<<" por Epsilon!!!!\n";
                                             while(!this->characters.empty()){
-                                                //cout<<this->characters.top()<<endl;
                                                 characters.pop();
                                             }
                                             return isAccepted;

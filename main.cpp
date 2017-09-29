@@ -7,7 +7,7 @@
 
 #include "condition.h"
 #include "state.h"
-#include "stackautomaton.h"
+#include "pushDownAutomaton.h"
 #include "dialog.h"
 
 #include <QApplication>

@@ -7,7 +7,7 @@ Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
-    this->stackAutomaton = new StackAutomaton(25);
+    this->pda = new PushDownAutomaton(25);
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -20,17 +20,17 @@ Dialog::~Dialog()
 
 void Dialog::on_initialState_clicked()
 {
-    if(!stackAutomaton->existInicialState()){
+    if(!pda->existInicialState()){
         retryName:
         const QString name = QInputDialog::getText(this,"Estado inicial","Nombre del estado");
         if(name.size() == 0){
             QMessageBox::warning(this,"Error de creacion","El nombre no puede estar vacio");
             goto retryName;
         }
-        stackAutomaton->newState(name,1);
-        Dialog::drawState(stackAutomaton->getNumStates(),Qt::red,name);
+        pda->newState(name,1);
+        Dialog::drawState(pda->getNumStates(),Qt::red,name);
     }else{
-        QString name = stackAutomaton->getState(0).getName();
+        QString name = pda->getState(0).getName();
         QMessageBox::critical(this,"Error de creacion","El estado inicial ya existe: "+name);
     }
 }
@@ -43,9 +43,9 @@ void Dialog::on_normalState_clicked()
         QMessageBox::warning(this,"Error de creacion","El nombre no puede estar vacio");
         goto retryName;
     }
-    if(stackAutomaton->getNumOfState(name) == -1){
-        stackAutomaton->newState(name,2);
-        Dialog::drawState(stackAutomaton->getNumStates(),Qt::blue,name);
+    if(pda->getNumOfState(name) == -1){
+        pda->newState(name,2);
+        Dialog::drawState(pda->getNumStates(),Qt::blue,name);
     }else QMessageBox::warning(this,"Error de creacion","El estado ya existe!");
 }
 
@@ -57,9 +57,9 @@ void Dialog::on_acceptanceState_clicked()
         QMessageBox::warning(this,"Error de creacion","El nombre no puede estar vacio");
         goto retryName;
     }
-    if(stackAutomaton->getNumOfState(name) == -1){
-        stackAutomaton->newState(name,3);
-        Dialog::drawState(stackAutomaton->getNumStates(),Qt::green,name);
+    if(pda->getNumOfState(name) == -1){
+        pda->newState(name,3);
+        Dialog::drawState(pda->getNumStates(),Qt::green,name);
     }else QMessageBox::warning(this,"Error de creacion","El estado ya existe!");
 }
 
@@ -76,14 +76,14 @@ void Dialog::on_newCondition_clicked()
     if(origin.size() == 0 || destination.size() == 0 || temp.size() == 0 || c.x.size() == 0 || c.y.size() == 0){
         QMessageBox::warning(this,"Error de creacion","Todos los campos son obligatorios!");
     }else{
-        int a = stackAutomaton->getNumOfState(origin), b = stackAutomaton->getNumOfState(destination);
+        int a = pda->getNumOfState(origin), b = pda->getNumOfState(destination);
         if(a != -1 &&  b != -1){
-            if(!stackAutomaton->existCondition(origin,destination,c)){
-                stackAutomaton->newCondition(origin,destination,c);
-                //this->drawCondition(origin,destination,c);
+            if(!pda->existCondition(origin,destination,c)){
+                pda->newCondition(origin,destination,c);
+                //this->drawCondition(origin,destination,c);  //Sin criterio
                 QMessageBox::information(this,"Nueva codicion","La condicion ha sido creada exitosamente!");
             }else{
-                stackAutomaton->newCondition(origin,destination,c);
+                pda->newCondition(origin,destination,c);
                 QMessageBox::information(this,"Nueva codicion","La condicion ya existe!");
             }
         }else{
@@ -104,10 +104,10 @@ void Dialog::on_validateExpression_clicked()
     expression = ui->expression->text();
     if(expression.size() != 0){
         QVector<State> s;
-        stackAutomaton->getAcceptanceStates(s);
-        if(stackAutomaton->existInicialState()){
+        pda->getAcceptanceStates(s);
+        if(pda->existInicialState()){
             if(s.size() != 0){
-                if(stackAutomaton->validateExpression(expression)){
+                if(pda->validateExpression(expression)){
                     QMessageBox::information(this,"Resultado","Expresion aceptada!");
                 }else{
                     QMessageBox::information(this,"Resultado","Expresion no aceptada!");
