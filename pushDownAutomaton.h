@@ -6,7 +6,23 @@
 #include <QVector>
 #include <QStack>
 #include <QString>
+#include "dialog.h"
+#include "ui_dialog.h"
+#include <QMessageBox>
+#include <QInputDialog>
+
 #include "state.h"
+
+
+#define EMPTY 0
+#define NOEXIST -1
+#define CREATEDCONDITION 1
+#define NOSTATE 2
+#define NOORIGIN 3
+#define NODESTINATION 4
+#define EXISTCONDITION 5
+#define INVALIDCONDITION 6
+
 
 using namespace std;
 
@@ -19,7 +35,11 @@ class PushDownAutomaton{
         QStack<char> characters;
         QString expression;
         bool isAccepted;
+        QString origin, destination, tape;
+        condition myCondition;
+        QVector<QString> path;
     public:
+        QVector<QString> auxPath;
         PushDownAutomaton(){
             characters.push('#');
             maxStates = 1;
@@ -37,6 +57,23 @@ class PushDownAutomaton{
             for(int i = 0;i < max;i++){
                 matAdj[i] = new QVector<condition>[max];
             }
+        }
+
+        void setOrigin(QString origin){
+            this->origin = origin;
+        }
+
+        void setDestination(QString destination){
+            this->destination = destination;
+        }
+
+        void setCondition(QString tape, QString pop, QString push){
+            string auxTape; //Convertir de QString a std string
+            this->tape = tape;
+            auxTape = tape.toStdString();
+            myCondition.tape = auxTape[0];
+            myCondition.pop = pop;
+            myCondition.push = push;
         }
 
         int getMaxStates(){
@@ -93,28 +130,37 @@ class PushDownAutomaton{
         bool existCondition(QString a, QString b, condition c){
             int va = getNumOfState(a);
             int vb = getNumOfState(b);
-            if(va<0 || vb<0){
+            if(va == NOEXIST || vb == NOEXIST){
                 return false;
             }else{
                 for(int i=0;i<matAdj[va][vb].size();i++)
-                    if(matAdj[va][vb][i].tape == c.tape && matAdj[va][vb][i].x == c.x && matAdj[va][vb][i].y == c.y)
+                    if(matAdj[va][vb][i].tape == c.tape && matAdj[va][vb][i].pop == c.pop && matAdj[va][vb][i].push == c.push)
                         return true;
                 return false;
             }
         }
 
-        void newCondition(QString a, QString b, condition c){
-            int va = getNumOfState(a);
-            int vb = getNumOfState(b);
-            if(va<0 && vb<0){
-                qDebug() << "\n\n\t\tNo existen los estados";
-            }else if(va<0){
-                qDebug() << "\n\n\t\tEl estado origen no existe!";
-            }else if(vb<0){
-                qDebug() << "\n\n\t\tEl estado destino no existe!";
+        int newCondition(){
+            int origin = getNumOfState(this->origin), destination = getNumOfState(this->destination);
+
+            if(origin == NOEXIST && destination == NOEXIST){
+                return NOSTATE;
+            }else if(origin == NOEXIST){
+                return NOORIGIN;
+            }else if(destination == NOEXIST){
+                return NODESTINATION;
             }else{
-                matAdj[va][vb].push_back(c);
-                qDebug() << "\n\n\t\tCondicion creada correctamente!";
+                if(tape == EMPTY || myCondition.pop == EMPTY || myCondition.push == EMPTY){
+                    return INVALIDCONDITION;
+                }else{
+                    if(existCondition(this->origin,this->destination,myCondition)){
+                        return EXISTCONDITION;
+                    }else{
+                        matAdj[origin][destination].push_back(this->myCondition);
+                        return CREATEDCONDITION;
+                    }
+
+                }
             }
         }
 
@@ -166,19 +212,6 @@ class PushDownAutomaton{
             }
         }
 
-        void printConditions(){
-            for(int i=0;i<numStates;i++){
-                for(int j=0;j<numStates;j++){
-                    if(matAdj[i][j].size() > 0){
-                        qDebug()<<"\nCondiciones de \""<<states[i].getName()<<"\" hacia \""<<states[j].getName()<<"\"\n";
-                        for(int k=0;k<matAdj[i][j].size();k++){
-                            qDebug()<<matAdj[i][j][k].tape<<", "<<matAdj[i][j][k].x<<"/ "<<matAdj[i][j][k].y<<endl;
-                        }
-                    }
-                }
-            }
-        }
-
         bool seekAcceptance(QString origin, QString destination, int level){
             if(!isAccepted){
                 int v = getNumOfState(origin);
@@ -187,11 +220,17 @@ class PushDownAutomaton{
                         if(level < expression.size()){
                             for(int j=0;j<matAdj[v][i].size();j++){
                                 if(matAdj[v][i][j].tape == expression[level]){
-                                    if(characters.top() == matAdj[v][i][j].x[0]){
+                                    if(characters.top() == matAdj[v][i][j].pop[0]){
                                         if(states[i].getName() ==  destination && expression.size()-1 == level){
+
                                             isAccepted=true;
                                             while(!this->characters.empty()){
                                                 characters.pop();
+                                            }
+                                            path.push_back(origin);
+                                            path.push_back(destination);
+                                            for(int p=0;p<path.size();p++){
+                                                auxPath.push_back(path[p]);
                                             }
                                             return isAccepted;
                                         }else{
@@ -201,16 +240,18 @@ class PushDownAutomaton{
                                             QVector<char> toApile;
                                             toApile.push_back(this->characters.top());
                                             this->characters.pop();
-                                            if(matAdj[v][i][j].y != "~"){
+                                            if(matAdj[v][i][j].push != "~"){
                                                 put=true;
-                                                for(k=0;k<matAdj[v][i][j].y.size();k++){
-                                                    qs = matAdj[v][i][j].y.toStdString();
+                                                for(k=0;k<matAdj[v][i][j].push.size();k++){
+                                                    qs = matAdj[v][i][j].push.toStdString();
                                                     this->characters.push(qs[k]);
                                                 }
                                             }
+                                            path.push_back(origin);
                                             return seekAcceptance(states[i].getName(),destination,level+1);
+                                            path.pop_back();
                                             if(put){
-                                                for(k=0;k<matAdj[v][i][j].y.size();k++)
+                                                for(k=0;k<matAdj[v][i][j].push.size();k++)
                                                     this->characters.pop();
                                             }
 
@@ -224,7 +265,7 @@ class PushDownAutomaton{
                         }else{
                             for(int m=0;m<matAdj[v][i].size();m++){
                                 if(matAdj[v][i][m].tape == '~'){
-                                    if(characters.top() == matAdj[v][i][m].x[0]){
+                                    if(characters.top() == matAdj[v][i][m].pop[0]){
                                         if(states[i].getName() ==  destination && expression.size()-1 == level){
                                             isAccepted=true;
                                             while(!this->characters.empty()){
@@ -242,9 +283,10 @@ class PushDownAutomaton{
         }
 
         bool validateExpression(QString expression){
-            while(!this->characters.empty()){
-                this->characters.pop();
-            }
+            while(!this->auxPath.empty()) this->auxPath.pop_front();
+            while(!this->path.empty()) this->path.pop_front();
+            while(!this->characters.empty()) this->characters.pop();
+
             this->characters.push('#');
             QVector<State> s;
             getAcceptanceStates(s);
@@ -252,10 +294,12 @@ class PushDownAutomaton{
             State initial = this->getInitialState();
             isAccepted=false;
             for(int i=0;i<s.size();i++){
-                seekAcceptance(initial.getName(),s[i].getName(),0);
+                if(seekAcceptance(initial.getName(),s[i].getName(),0)){ //Si encuentra un estado de aceptacion termina la busqueda
+                    break;
+                }
             }
             return isAccepted;
         }
 };
 
-#endif // STACKAUTOMATON_H
+#endif // PUSHDOWNAUTOMATON_H

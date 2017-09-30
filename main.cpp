@@ -5,9 +5,6 @@
 #include <QString>
 #include <QStyleFactory>
 
-#include "condition.h"
-#include "state.h"
-#include "pushDownAutomaton.h"
 #include "dialog.h"
 
 #include <QApplication>
@@ -17,8 +14,6 @@ int main(int argc, char *argv[])
     QApplication a(argc, argv);
     a.setStyle("fusion");
     Dialog w;
-    //w.style("fusion")
-    //w.Dialog::setStyle(QStyleFactory::create("fusion"));
     QPalette palette;
     palette.setColor(QPalette::Window, QColor(53,53,53));
     palette.setColor(QPalette::WindowText, Qt::white);

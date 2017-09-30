@@ -41,7 +41,7 @@ public:
             QPen pen(Qt::red);
             pen.setWidth(2);
             currentState = scene->addEllipse(x,y,65,65,pen,brush);
-        }else{ //Drawing Tara
+        }else{ //Drawing Transtition state
             QBrush brush(QColor(0,0,255,150));
             QPen pen(Qt::blue);
             pen.setWidth(2);
@@ -91,9 +91,11 @@ public:
         scene->addItem(graphicText);
         states.push_back(currentState);*/
     }
+
     ~Dialog();
 
 private slots:
+    //Buttom events
     void on_initialState_clicked();
 
     void on_normalState_clicked();

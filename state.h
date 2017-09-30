@@ -3,6 +3,10 @@
 
 #include "condition.h"
 
+#define INITIAL 1
+#define TRANSITION 2
+#define ACCEPTANCE 3
+
 class State{
     protected:
         QString name;
@@ -19,11 +23,11 @@ class State{
 
         QString getType(){
             switch(type){
-                case 1:
+                case INITIAL:
                     return "Inicial";
-                case 2:
+                case TRANSITION:
                     return "Transicion";
-                case 3:
+                case ACCEPTANCE:
                     return "Aceptacion";
                 default:
                     return "Sin tipo";

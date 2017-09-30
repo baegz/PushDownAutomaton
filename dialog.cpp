@@ -3,11 +3,13 @@
 #include <QMessageBox>
 #include <QInputDialog>
 
+#define MAXSTATE 25
+
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
-    this->pda = new PushDownAutomaton(25);
+    this->pda = new PushDownAutomaton(MAXSTATE);
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
@@ -51,12 +53,11 @@ void Dialog::on_normalState_clicked()
 
 void Dialog::on_acceptanceState_clicked()
 {
-    retryName:
-    const QString name = QInputDialog::getText(this,"Estado de aceptacion","Nombre del estado");
-    if(name.size() == 0){
-        QMessageBox::warning(this,"Error de creacion","El nombre no puede estar vacio");
-        goto retryName;
-    }
+    QString name;
+    do{
+        name = QInputDialog::getText(this,"Estado de aceptacion","Nombre del estado");
+    }while(name.size() == EMPTY);
+
     if(pda->getNumOfState(name) == -1){
         pda->newState(name,3);
         Dialog::drawState(pda->getNumStates(),Qt::green,name);
@@ -65,41 +66,35 @@ void Dialog::on_acceptanceState_clicked()
 
 void Dialog::on_newCondition_clicked()
 {
-    QString origin = ui->origin->text();
-    QString destination = ui->destination->text();
-    condition c;
-    string temp;
-    temp = ui->tape->text().toStdString();
-    c.tape = temp[0];
-    c.x = ui->pop->text();
-    c.y = ui->push->text();
-    if(origin.size() == 0 || destination.size() == 0 || temp.size() == 0 || c.x.size() == 0 || c.y.size() == 0){
-        QMessageBox::warning(this,"Error de creacion","Todos los campos son obligatorios!");
-    }else{
-        int a = pda->getNumOfState(origin), b = pda->getNumOfState(destination);
-        if(a != -1 &&  b != -1){
-            if(!pda->existCondition(origin,destination,c)){
-                pda->newCondition(origin,destination,c);
-                //this->drawCondition(origin,destination,c);  //Sin criterio
-                QMessageBox::information(this,"Nueva codicion","La condicion ha sido creada exitosamente!");
-            }else{
-                pda->newCondition(origin,destination,c);
-                QMessageBox::information(this,"Nueva codicion","La condicion ya existe!");
-            }
-        }else{
-            if(a == -1){
-                QMessageBox::warning(this,"Error de creacion","El estado de origen no existe!");
-            }else{
-                QMessageBox::warning(this,"Error de creacion","El estado destino no existe!");
-            }
-
-        }
-
+    pda->setOrigin(ui->origin->text());
+    pda->setDestination(ui->destination->text());
+    pda->setCondition(ui->tape->text(),ui->pop->text(),ui->push->text());
+    int result = pda->newCondition();
+    switch(result){
+        case CREATEDCONDITION:
+            QMessageBox::information(this,"Nueva condicion","Condicion creada exitosamente!");
+            break;
+        case NOSTATE:
+            QMessageBox::critical(this,"Nueva condicion","No existen estados");
+            break;
+        case NOORIGIN:
+            QMessageBox::critical(this,"Nueva condicion","No existe el estado origen!");
+            break;
+        case NODESTINATION:
+            QMessageBox::critical(this,"Nueva condicion","No existe el estado de destino!");
+            break;
+        case EXISTCONDITION:
+            QMessageBox::information(this,"Nueva condicion","La condicion ya existe!");
+            break;
+        case INVALIDCONDITION:
+            QMessageBox::warning(this,"Nueva condicion","Condicion invalida, todos los campos son obligatorios");
+            break;
     }
 }
 
 void Dialog::on_validateExpression_clicked()
 {
+    QString path="";
     QString expression;
     expression = ui->expression->text();
     if(expression.size() != 0){
@@ -108,7 +103,10 @@ void Dialog::on_validateExpression_clicked()
         if(pda->existInicialState()){
             if(s.size() != 0){
                 if(pda->validateExpression(expression)){
-                    QMessageBox::information(this,"Resultado","Expresion aceptada!");
+                    for(int i=0;i<this->pda->auxPath.size();i++){
+                        path=path+pda->auxPath[i]+"->";
+                    }
+                    QMessageBox::information(this,"Resultado","Expresion aceptada\n"+path);
                 }else{
                     QMessageBox::information(this,"Resultado","Expresion no aceptada!");
                 }
