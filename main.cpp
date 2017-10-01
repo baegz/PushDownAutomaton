@@ -1,18 +1,18 @@
 #include <QDebug>
-#include <QCharRef>
 #include <QVector>
 #include <QStack>
 #include <QString>
 #include <QStyleFactory>
-
-#include "dialog.h"
-
+#include <condition.h>
+#include <state.h>
+#include <pushDownAutomaton.h>
+#include <dialog.h>
 #include <QApplication>
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
     QApplication a(argc, argv);
     a.setStyle("fusion");
+
     Dialog w;
     QPalette palette;
     palette.setColor(QPalette::Window, QColor(53,53,53));
@@ -25,11 +25,11 @@ int main(int argc, char *argv[])
     palette.setColor(QPalette::Button, QColor(53,53,53));
     palette.setColor(QPalette::ButtonText, Qt::white);
     palette.setColor(QPalette::BrightText, Qt::red);
-
     palette.setColor(QPalette::Highlight, QColor(142,45,197).lighter());
     palette.setColor(QPalette::HighlightedText, Qt::black);
+
     w.setPalette(palette);
-    w.setWindowTitle("Automata de pila: por Leonardo Ospino & Leonardo Burgos");
+    w.setWindowTitle("PushDownAutomaton Simulator BETA");
     w.show();
     return a.exec();
 }

@@ -25,6 +25,9 @@
   <property name="windowTitle">
    <string>Dialog</string>
   </property>
+  <property name="sizeGripEnabled">
+   <bool>false</bool>
+  </property>
   <widget class="QGraphicsView" name="graphicsView">
    <property name="enabled">
     <bool>true</bool>
@@ -175,10 +178,18 @@
       <item>
        <layout class="QVBoxLayout" name="verticalLayout_9">
         <item>
-         <widget class="QLineEdit" name="origin"/>
+         <widget class="QLineEdit" name="origin">
+          <property name="maxLength">
+           <number>3</number>
+          </property>
+         </widget>
         </item>
         <item>
-         <widget class="QLineEdit" name="destination"/>
+         <widget class="QLineEdit" name="destination">
+          <property name="maxLength">
+           <number>3</number>
+          </property>
+         </widget>
         </item>
         <item>
          <widget class="QLineEdit" name="tape">
@@ -197,7 +208,7 @@
         <item>
          <widget class="QLineEdit" name="push">
           <property name="maxLength">
-           <number>10</number>
+           <number>3</number>
           </property>
          </widget>
         </item>

@@ -1,18 +1,22 @@
-#include "dialog.h"
-#include "ui_dialog.h"
+#include <dialog.h>
+#include <ui_dialog.h>
 #include <QMessageBox>
 #include <QInputDialog>
-
-#define MAXSTATE 25
 
 Dialog::Dialog(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::Dialog)
 {
-    this->pda = new PushDownAutomaton(MAXSTATE);
+    int MAXSTATES=0;
+    do{
+        MAXSTATES = QInputDialog::getText(this,STARTTITLE,GETLIMIT).toInt();
+    }while(MAXSTATES < 1);
+    this->pda = new PushDownAutomaton(MAXSTATES);
+
     ui->setupUi(this);
     scene = new QGraphicsScene(this);
     ui->graphicsView->setScene(scene);
+    movingState = true;
 }
 
 Dialog::~Dialog()
@@ -20,56 +24,48 @@ Dialog::~Dialog()
     delete ui;
 }
 
-void Dialog::on_initialState_clicked()
-{
+void Dialog::on_initialState_clicked(){
     if(!pda->existInicialState()){
-        retryName:
-        const QString name = QInputDialog::getText(this,"Estado inicial","Nombre del estado");
-        if(name.size() == 0){
-            QMessageBox::warning(this,"Error de creacion","El nombre no puede estar vacio");
-            goto retryName;
-        }
-        pda->newState(name,1);
-        Dialog::drawState(pda->getNumStates(),Qt::red,name);
-    }else{
-        QString name = pda->getState(0).getName();
-        QMessageBox::critical(this,"Error de creacion","El estado inicial ya existe: "+name);
+        QString name = "q"+QString::number(pda->getNumStates());
+        if(pda->newState(name,INITIAL)){
+            GraphicState *state = new GraphicState(name,INITIAL);
+            state->setPos(Dialog::randomBetween(-350,350),Dialog::randomBetween(-170,170));
+            scene->addItem(state);
+            ui->initialState->setEnabled(false);
+        }else
+            QMessageBox::critical(this,ERRORNEWSTATE,LIMITSTATE);
     }
 }
 
-void Dialog::on_normalState_clicked()
-{
-    retryName:
-    const QString name = QInputDialog::getText(this,"Estado de transicion","Nombre del estado");
-    if(name.size() == 0){
-        QMessageBox::warning(this,"Error de creacion","El nombre no puede estar vacio");
-        goto retryName;
-    }
-    if(pda->getNumOfState(name) == -1){
-        pda->newState(name,2);
-        Dialog::drawState(pda->getNumStates(),Qt::blue,name);
-    }else QMessageBox::warning(this,"Error de creacion","El estado ya existe!");
+void Dialog::on_normalState_clicked(){
+    QString name = "q"+QString::number(pda->getNumStates());
+
+    if(pda->newState(name,TRANSITION)){
+        GraphicState *state = new GraphicState(name,TRANSITION);
+        state->setPos(Dialog::randomBetween(-350,350),Dialog::randomBetween(-170,170));
+        scene->addItem(state);
+    }else
+        QMessageBox::critical(this,ERRORNEWSTATE,LIMITSTATE);
 }
 
-void Dialog::on_acceptanceState_clicked()
-{
-    QString name;
-    do{
-        name = QInputDialog::getText(this,"Estado de aceptacion","Nombre del estado");
-    }while(name.size() == EMPTY);
+void Dialog::on_acceptanceState_clicked(){
+    QString name = "q"+QString::number(pda->getNumStates());
 
-    if(pda->getNumOfState(name) == -1){
-        pda->newState(name,3);
-        Dialog::drawState(pda->getNumStates(),Qt::green,name);
-    }else QMessageBox::warning(this,"Error de creacion","El estado ya existe!");
+    if(pda->newState(name,ACCEPTANCE)){
+        GraphicState *state = new GraphicState(name,ACCEPTANCE);
+        state->setPos(Dialog::randomBetween(-350,350),Dialog::randomBetween(-170,170));
+        scene->addItem(state);
+    }else
+        QMessageBox::critical(this,ERRORNEWSTATE,LIMITSTATE);
 }
 
-void Dialog::on_newCondition_clicked()
-{
+void Dialog::on_newCondition_clicked(){
     pda->setOrigin(ui->origin->text());
     pda->setDestination(ui->destination->text());
     pda->setCondition(ui->tape->text(),ui->pop->text(),ui->push->text());
+
     int result = pda->newCondition();
+
     switch(result){
         case CREATEDCONDITION:
             QMessageBox::information(this,"Nueva condicion","Condicion creada exitosamente!");
@@ -92,21 +88,18 @@ void Dialog::on_newCondition_clicked()
     }
 }
 
-void Dialog::on_validateExpression_clicked()
-{
-    QString path="";
+void Dialog::on_validateExpression_clicked(){
     QString expression;
     expression = ui->expression->text();
-    if(expression.size() != 0){
+
+    if(expression.size() != EMPTY){
         QVector<State> s;
         pda->getAcceptanceStates(s);
+
         if(pda->existInicialState()){
-            if(s.size() != 0){
+            if(s.size() != EMPTY){
                 if(pda->validateExpression(expression)){
-                    for(int i=0;i<this->pda->auxPath.size();i++){
-                        path=path+pda->auxPath[i]+"->";
-                    }
-                    QMessageBox::information(this,"Resultado","Expresion aceptada\n"+path);
+                    QMessageBox::information(this,"Resultado","Expresion aceptada!");
                 }else{
                     QMessageBox::information(this,"Resultado","Expresion no aceptada!");
                 }

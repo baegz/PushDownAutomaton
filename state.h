@@ -1,7 +1,7 @@
 #ifndef STATE_H
 #define STATE_H
 
-#include "condition.h"
+#include <condition.h>
 
 #define INITIAL 1
 #define TRANSITION 2
@@ -21,17 +21,8 @@ class State{
             numOfState = -1;
         }
 
-        QString getType(){
-            switch(type){
-                case INITIAL:
-                    return "Inicial";
-                case TRANSITION:
-                    return "Transicion";
-                case ACCEPTANCE:
-                    return "Aceptacion";
-                default:
-                    return "Sin tipo";
-            }
+        int getType(){
+            return type;
         }
 
         State(QString name, int num, int type){

@@ -2,6 +2,8 @@
 #
 # Project created by QtCreator 2017-09-25T08:21:05
 #
+# Written by: Leonardo Ospino & Leonardo Burgos
+#
 #-------------------------------------------------
 
 QT       += core gui
@@ -25,13 +27,15 @@ DEFINES += QT_DEPRECATED_WARNINGS
 
 SOURCES += \
         main.cpp \
-        dialog.cpp
+        dialog.cpp \
+    graphicstate.cpp
 
 HEADERS += \
         dialog.h \
     condition.h \
     state.h \
-    pushDownAutomaton.h
+    pushDownAutomaton.h \
+    graphicstate.h
 
 FORMS += \
         dialog.ui
