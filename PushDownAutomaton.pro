@@ -28,16 +28,24 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += \
         main.cpp \
         dialog.cpp \
-    graphicstate.cpp
+    graphwidget.cpp \
+    edge.cpp \
+    node.cpp \
+    pushdownautomaton.cpp \
+    state.cpp
 
 HEADERS += \
         dialog.h \
     condition.h \
     state.h \
     pushDownAutomaton.h \
-    graphicstate.h
+    graphwidget.h \
+    edge.h \
+    node.h
 
 FORMS += \
         dialog.ui
 
-RC_ICONS = icon.ico
+RC_ICONS = pda.ico
+
+QMAKE_CXXFLAGS += -std=gnu++14

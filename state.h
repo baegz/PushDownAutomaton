@@ -2,58 +2,34 @@
 #define STATE_H
 
 #include <condition.h>
+#include <QString>
 
 #define INITIAL 1
 #define TRANSITION 2
 #define ACCEPTANCE 3
 
-class State{
-    protected:
-        QString name;
-        int numOfState;
-        int type;
-    public:
-        State(){}
+class State
+{
+public:
+    State(){}
+    State(QString name);
+    State(QString name, int num, int type);
 
-        State(QString name){
-            this->name = name;
-            this->type = 2;
-            numOfState = -1;
-        }
+    bool similar(State v);
+    bool similar(QString name);
 
-        int getType(){
-            return type;
-        }
+    int getNumOfState();
+    int getType();
 
-        State(QString name, int num, int type){
-            this->name = name;
-            this->numOfState = num;
-            this->type = type;
-        }
+    QString getName();
 
-        void setName(const QString name){
-            this->name = name;
-        }
+    void setName(const QString name);
+    void setNumOfState(int num);
 
-        void setNumOfState(int num){
-            this->numOfState = num;
-        }
-
-        QString getName(){
-            return this->name;
-        }
-
-        int getNumOfState(){
-            return this->numOfState;
-        }
-
-        bool similar(State v){
-            return v.name == this->name;
-        }
-
-        bool similar(QString name){
-            return name == this->name;
-        }
+private:
+    QString name;
+    int numOfState;
+    int type;
 };
 
 #endif // STATE_H

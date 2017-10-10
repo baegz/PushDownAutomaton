@@ -1,5 +1,6 @@
 #ifndef CONDITION_H
 #define CONDITION_H
+#include <QString>
 
 //Structure of condition on PDA
 
